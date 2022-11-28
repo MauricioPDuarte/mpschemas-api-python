@@ -1,48 +1,35 @@
 from flask import Flask, make_response, jsonify, request
-from schemas import Schemas;
 from flask_restful import Api
-from flask_sqlalchemy import SQLAlchemy
+from flask_jwt_extended import JWTManager
+from resources.brand import Brand, Brands
+from resources.schema import Schemas
+from resources.type_device import TypeDevice, TypesDevice
+
 
 
 
 app = Flask(__name__)
-app.config['JSON_SORT_KEYS'] = False
+api = Api(app)
+jwt = JWTManager(app)
 
-# conexão com mysql
+# Configs
+app.config['JSON_SORT_KEYS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Master123@localhost/mpschemas?charset=utf8mb4'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JWT_SECRET_KEY'] = 'mpschemas2022trabalhoaulafacul'
 
 
+@app.before_first_request
+def create_database():
+    database.create_all()
 
-api = Api(app)
-
-db = SQLAlchemy()
-db.init_app(app)
-
-
-@app.route("/schemas", methods=['GET'])
-def get_schemas():
-    return make_response(
-        jsonify(
-            message='success',
-            data=Schemas
-        ),
-    )
-
-@app.route("/schemas", methods=['POST'])
-def create_schema():
-    schema = request.json
-    Schemas.append(schema);
-    return make_response(
-        jsonify(
-            message='success',
-            data=schema
-        ),
-    )
-
-
-with app.app_context(): 
-    db.create_all()
+api.add_resource(Schemas, '/schemas')
+api.add_resource(TypesDevice, '/types_device')
+api.add_resource(TypeDevice, '/types_device')
+api.add_resource(Brands, '/brands')
+api.add_resource(Brand, '/brands')
 
 if __name__ == '__main__':
+    from sql_alchemy import database
+    database.init_app(app)
     app.run(debug=True)
