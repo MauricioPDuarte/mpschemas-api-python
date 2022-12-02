@@ -16,9 +16,13 @@ class TypeDevice(Resource):
             return {'data':device.json(), 'code': 200 }, 200
         return {'message':'Type device not found', 'code': 404}, 404
 
-    def post(self):
+    def post(self, id):
         dados = TypeDevice.minha_requisicao.parse_args()
         new_device = TypeDeviceModel(**dados)
+
+        exists = new_device.find_type_device_by_name(dados.name)
+        if exists:
+              return {'data': 'ALREADY_EXISTS', 'code': 400 }, 400
         
         try:
             new_device.save_type_device()
@@ -30,6 +34,10 @@ class TypeDevice(Resource):
         dados = TypeDevice.minha_requisicao.parse_args()
         device = TypeDeviceModel.find_type_device_by_id(id)
         if device:
+            exists = device.find_type_device_by_name(dados.name)
+            if exists:
+                return {'data': 'ALREADY_EXISTS', 'code': 400 }, 400
+
             device.update_type_device(**dados)
             device.save_type_device()
             return {'data': device.json(), 'code': 200 }, 200

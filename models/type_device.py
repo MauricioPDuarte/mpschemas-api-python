@@ -1,4 +1,4 @@
-from xmlrpc.client import DateTime
+from operator import and_
 from sql_alchemy import database
 from sqlalchemy.sql import func
 
@@ -21,6 +21,18 @@ class TypeDeviceModel(database.Model):
         if schema:
             return schema
         return None
+
+    def find_type_device_by_name(cls, name):
+        schema = cls.query.filter(
+            and_(
+                TypeDeviceModel.name.like(name),
+                TypeDeviceModel.id != cls.id
+            )
+        ).first() 
+        if schema:
+            return schema
+        return None
+
 
     def save_type_device(self): 
         database.session.add(self)

@@ -4,12 +4,14 @@ from flask_jwt_extended import JWTManager
 from resources.brand import Brand, Brands
 from resources.schema import Schemas
 from resources.type_device import TypeDevice, TypesDevice
+from flask_cors import CORS, cross_origin
 
 
 
 
 app = Flask(__name__)
 api = Api(app)
+cors = CORS(app)
 jwt = JWTManager(app)
 
 # Configs
