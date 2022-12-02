@@ -4,7 +4,7 @@ from models.type_device import TypeDeviceModel
 
 class TypesDevice(Resource):
     def get(self):
-        return {'types_device': [device.json() for device in TypeDeviceModel.query.all()]}
+        return {'data': [device.json() for device in TypeDeviceModel.query.all()], 'code': 200}
 
 class TypeDevice(Resource):
     minha_requisicao = reqparse.RequestParser()
@@ -13,8 +13,8 @@ class TypeDevice(Resource):
     def get(self, id):
         device = TypeDeviceModel.find_type_device_by_id(id)
         if device:
-            return device.json()
-        return {'message':'device not found'}, 200 # or 204
+            return {'data':device.json(), 'code': 200 }, 200
+        return {'message':'Type device not found', 'code': 404}, 404
 
     def post(self):
         dados = TypeDevice.minha_requisicao.parse_args()
@@ -22,25 +22,24 @@ class TypeDevice(Resource):
         
         try:
             new_device.save_type_device()
+            return {'data': 'Success', 'code': 201}, 201
         except:
-            return {'message':'An internal error ocurred.'}, 500
+            return {'message':'An internal error ocurred.', 'code':  500}, 500
 
     def put(self, id):
         dados = TypeDevice.minha_requisicao.parse_args()
-        device = TypeDeviceModel.find_device_by_id(id)
+        device = TypeDeviceModel.find_type_device_by_id(id)
         if device:
-            device.update_device(**dados)
-            device.save_device()
-            return device.json(), 200
+            device.update_type_device(**dados)
+            device.save_type_device()
+            return {'data': device.json(), 'code': 200 }, 200
 
-        device_id = TypeDeviceModel.find_last_device()
-        new_device = TypeDeviceModel(device_id, **dados)
-        new_device.save_type_device()
-        return new_device.json(), 201
+        return {'data':'Type device not found', 'code': 404}, 404
 
+ 
     def delete(self, id):
         device = TypeDeviceModel.find_type_device_by_id(id)
         if device:
             device.delete_type_device()
-            return {'message' : 'Device deleted.'}
-        return {'message' : 'device not founded'}, 204
+            return {'data' : 'Type device deleted', 'code': 200}, 200
+        return {'data' : 'Type device not founded', 'code': 404}, 404

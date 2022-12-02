@@ -26,10 +26,8 @@ class TypeDeviceModel(database.Model):
         database.session.add(self)
         database.session.commit()
 
-    def update_type_device(self, name, rating, duration): 
+    def update_type_device(self, name): 
         self.name = name
-        self.rating = rating
-        self.duration = duration
 
     def delete_type_device(self): 
         database.session.delete(self)

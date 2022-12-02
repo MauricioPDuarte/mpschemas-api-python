@@ -14,7 +14,7 @@ jwt = JWTManager(app)
 
 # Configs
 app.config['JSON_SORT_KEYS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Master123@localhost/mpschemas?charset=utf8mb4'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@localhost/mpschemas?charset=utf8mb4'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = 'mpschemas2022trabalhoaulafacul'
 
@@ -24,8 +24,10 @@ def create_database():
     database.create_all()
 
 api.add_resource(Schemas, '/schemas')
+
 api.add_resource(TypesDevice, '/types_device')
-api.add_resource(TypeDevice, '/types_device')
+api.add_resource(TypeDevice, '/types_device/<int:id>')
+
 api.add_resource(Brands, '/brands')
 api.add_resource(Brand, '/brands')
 
