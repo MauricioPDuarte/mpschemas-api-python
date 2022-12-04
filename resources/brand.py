@@ -4,7 +4,7 @@ from models.brand import BrandModel
 
 class Brands(Resource):
     def get(self):
-        return {'brands': [device.json() for device in BrandModel.query.all()]}
+        return {'data': [device.json() for device in BrandModel.query.all()], 'code': 200}, 200
 
 class Brand(Resource):
     minha_requisicao = reqparse.RequestParser()
@@ -13,34 +13,33 @@ class Brand(Resource):
     def get(self, id):
         device = BrandModel.find_brand_by_id(id)
         if device:
-            return device.json()
-        return {'message':'device not found'}, 200 # or 204
+            return {'data': device.json(), 'code': 200}, 200
+        return {'data':'device not found', 'code': 404}, 404 # or 204
 
-    def post(self):
+    def post(self, id):
         dados = Brand.minha_requisicao.parse_args()
         new_device = BrandModel(**dados)
         
         try:
             new_device.save_brand()
+            return {'data': 'success', 'code': 200}, 200
         except:
-            return {'message':'An internal error ocurred.'}, 500
+            return {'data':'An internal error ocurred.', 'code': 500}, 500
 
     def put(self, id):
         dados = Brand.minha_requisicao.parse_args()
-        device = BrandModel.find_device_by_id(id)
+        device = BrandModel.find_brand_by_id(id)
         if device:
-            device.update_device(**dados)
-            device.save_device()
+            device.update_brand(**dados)
+            device.save_brand()
             return device.json(), 200
+        else: 
+          return {'data': 'brand not founded', 'code': 404}, 404
 
-        device_id = BrandModel.find_last_device()
-        new_device = BrandModel(device_id, **dados)
-        new_device.save_brand()
-        return new_device.json(), 201
 
     def delete(self, id):
         device = BrandModel.find_brand_by_id(id)
         if device:
             device.delete_brand()
-            return {'message' : 'Brand deleted.'}
-        return {'message' : 'Brand not founded'}, 204
+            return {'data' : 'brand deleted', 'code': 200}, 200
+        return {'data' : 'brand not founded', 'code': 404}, 404
