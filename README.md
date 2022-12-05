@@ -8,3 +8,4 @@
 6- pip install flask-cors
 7- pip install flask-security
 8- email_validator
+9 -pip install secure-smtplib
