@@ -30,6 +30,7 @@ class SchemaModel(database.Model):
             'type_device_id': self.type_device_id,
             'user_id': self.user_id,
             'model_id': self.model_id,
+            'brand_id': self.brand_id,
             'user': {
                 'id': self.user.id,
                 'name': self.user.name,
