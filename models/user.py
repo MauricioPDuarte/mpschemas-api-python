@@ -1,3 +1,4 @@
+from hashlib import scrypt
 from sql_alchemy import database
 from sqlalchemy.sql.expression import func
 
@@ -7,13 +8,15 @@ class UserModel (database.Model):
     id = database.Column(database.Integer, primary_key = True)
     name = database.Column(database.String(250))
     email = database.Column(database.String(50))
-    password = database.Column(database.String(50))
+    password = database.Column(database.String(250))
 
     def __init__(self, id, email, password, name):
         self.id = id
         self.email = email
         self.password = password
         self.name = name
+
+
 
     def json(self):
         return {

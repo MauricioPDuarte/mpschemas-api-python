@@ -8,6 +8,7 @@ from resources.model import Model, Models
 from resources.schema import Schema, Schemas
 from resources.type_device import TypeDevice, TypesDevice
 from flask_cors import CORS, cross_origin
+from flask_mail import Mail
 
 from resources.users import User, Users
 from resources.users_session import UserSession
@@ -20,6 +21,7 @@ app = Flask(__name__)
 api = Api(app)
 cors = CORS(app)
 jwt = JWTManager(app)
+mail = Mail(app)
 
 # Configs
 app.config['JSON_SORT_KEYS'] = False
@@ -27,6 +29,13 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@localhost/mpschema
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = 'mpschemas2022trabalhoaulafacul'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+app.config['MAIL_SERVER'] = 'smtp.example.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USERNAME'] = 'mpschemas@gmail.com'
+app.config['MAIL_PASSWORD'] = 'mpschemas2022'
+
 
 
 

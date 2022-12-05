@@ -1,6 +1,6 @@
 from flask_restful import Resource, reqparse
 from models.user import UserModel
-from flask_jwt_extended import create_access_token
+from werkzeug.security import generate_password_hash, check_password_hash
 
 minha_requisicao = reqparse.RequestParser()
 minha_requisicao.add_argument('email', type=str, required=True, help="email is required")
@@ -17,6 +17,12 @@ class User(Resource):
         dados = minha_requisicao.parse_args()
         user = UserModel.find_user_by_id(id)
         if user:
+            if dados.password:
+                passwordHashad = generate_password_hash(dados.password)
+                dados["password"] = passwordHashad
+            else:
+                dados["password"] = user.password
+
             user.update_user(id, **dados)
             user.save_user()
             return user.json(), 200
@@ -47,7 +53,9 @@ class User(Resource):
 
         id = UserModel.find_last_user()
 
-        new_user = UserModel(id, **dados)
+        passwordHashad = generate_password_hash(dados.password)
+
+        new_user = UserModel(id, dados.email, passwordHashad, dados.name)
         
         try:
             print(new_user.json())

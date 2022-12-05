@@ -1,8 +1,11 @@
 from flask_restful import Resource, reqparse
+from flask_jwt_extended import jwt_required
+
 
 from models.type_device import TypeDeviceModel
 
 class TypesDevice(Resource):
+    @jwt_required()
     def get(self):
         return {'data': [device.json() for device in TypeDeviceModel.query.all()], 'code': 200}
 
@@ -10,12 +13,14 @@ class TypeDevice(Resource):
     minha_requisicao = reqparse.RequestParser()
     minha_requisicao.add_argument('name', type=str, required=True, help='name is required')
 
+    @jwt_required()
     def get(self, id):
         device = TypeDeviceModel.find_type_device_by_id(id)
         if device:
             return {'data':device.json(), 'code': 200 }, 200
         return {'message':'Type device not found', 'code': 404}, 404
 
+    @jwt_required()
     def post(self, id):
         dados = TypeDevice.minha_requisicao.parse_args()
         new_device = TypeDeviceModel(**dados)
@@ -30,6 +35,7 @@ class TypeDevice(Resource):
         except:
             return {'message':'An internal error ocurred.', 'code':  500}, 500
 
+    @jwt_required()
     def put(self, id):
         dados = TypeDevice.minha_requisicao.parse_args()
         device = TypeDeviceModel.find_type_device_by_id(id)
@@ -44,7 +50,7 @@ class TypeDevice(Resource):
 
         return {'data':'Type device not found', 'code': 404}, 404
 
- 
+    @jwt_required()
     def delete(self, id):
         device = TypeDeviceModel.find_type_device_by_id(id)
         if device:

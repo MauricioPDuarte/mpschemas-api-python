@@ -6,3 +6,5 @@
 4- pip install flask_sqlalchemy
 5- pip install pymysql
 6- pip install flask-cors
+7- pip install flask-security
+8- email_validator
