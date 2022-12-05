@@ -1,11 +1,18 @@
+import os
+import uuid
 from flask_restful import Resource, reqparse
 from models.user import UserModel
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.datastructures import FileStorage
+from utils import allowed_file
+from flask import current_app
 
 minha_requisicao = reqparse.RequestParser()
-minha_requisicao.add_argument('email', type=str, required=True, help="email is required")
-minha_requisicao.add_argument('name', type=str, required=True, help="name is required")
-minha_requisicao.add_argument('password', type=str, required=True, help="password is required")
+minha_requisicao.add_argument('email', location='form', type=str, required=True, help="email is required")
+minha_requisicao.add_argument('name', location='form', type=str, required=True, help="name is required")
+minha_requisicao.add_argument('phone', location='form', type=str, required=True, help="phone is required")
+minha_requisicao.add_argument('password', location='form', type=str, required=True, help="password is required")
+minha_requisicao.add_argument('file', type=FileStorage, location='files',  required=False)
 
 
 class Users(Resource):
@@ -23,14 +30,22 @@ class User(Resource):
             else:
                 dados["password"] = user.password
 
-            user.update_user(id, **dados)
-            user.save_user()
-            return user.json(), 200
+            filename = user.path
+            if dados.file and allowed_file(dados.file.filename):
+                filename = str(uuid.uuid4()) + '-' + dados.file.filename
+                path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                dados.file.save(path)
 
-        id = UserModel.find_last_user()
-        new_user = UserModel(id, **dados)
-        new_user.save_user()
-        return new_user.json(), 201
+                if user.path:
+                    oldpath = os.path.join(current_app.config['UPLOAD_FOLDER'], user.path)
+                    os.remove(oldpath)
+
+            user.update_user(id, dados.email, dados.password, dados.name, filename, dados.phone)
+            user.save_user()
+            return {'data': 'success', 'code': 200}, 200
+        return {'data': 'user not found', 'code': 404}, 404
+
+
 
     def get(self, id):
         user = UserModel.find_user_by_id(id)
@@ -49,13 +64,21 @@ class User(Resource):
         dados = minha_requisicao.parse_args()
 
         if UserModel.find_user_by_email(dados['email']):
-            return {'data':'email {} already exists'.format(dados['email']), 'code': 200}, 200
+            return {'data':'EMAIL_EXISTS'.format(dados['email']), 'code': 400}, 400
 
         id = UserModel.find_last_user()
 
         passwordHashad = generate_password_hash(dados.password)
 
-        new_user = UserModel(id, dados.email, passwordHashad, dados.name)
+        file = dados.file
+        filename = None
+        if file and allowed_file(file.filename):
+            filename = str(uuid.uuid4()) + '-' + dados.file.filename
+            path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            file.save(path)
+
+
+        new_user = UserModel(id, dados.email, passwordHashad, dados.name, filename, dados.phone)
         
         try:
             print(new_user.json())

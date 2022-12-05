@@ -98,11 +98,13 @@ def change_password():
         
         minutes = c.seconds / 60
 
+        print(minutes)
+
         if (minutes <= 5): 
             user = UserModel.find_user_by_id(forgotPassword.user_id)
             passwordHashad = generate_password_hash(new_password)
 
-            user.update_user(user.id, user.email, passwordHashad, user.name)
+            user.update_user(user.id, user.email, passwordHashad, user.name, user.path, user.phone)
             user.save_user()
         else: 
             return {'data':'code invalid', 'code': 400}, 400

@@ -7,14 +7,18 @@ class UserModel (database.Model):
     __tablename__ = 'users'
     id = database.Column(database.Integer, primary_key = True)
     name = database.Column(database.String(250))
+    phone = database.Column(database.String(50))
+    path = database.Column(database.String(250))
     email = database.Column(database.String(50))
     password = database.Column(database.String(250))
 
-    def __init__(self, id, email, password, name):
+    def __init__(self, id, email, password, name, path, phone):
         self.id = id
         self.email = email
         self.password = password
         self.name = name
+        self.path = path
+        self.phone = phone
 
 
 
@@ -22,7 +26,9 @@ class UserModel (database.Model):
         return {
             'id' : self.id,
             'name': self.name,
-            'email' : self.email
+            'email' : self.email,
+            'phone': self.phone,
+            'path': self.path,
         }
 
     @classmethod  
@@ -43,11 +49,13 @@ class UserModel (database.Model):
         database.session.add(self)
         database.session.commit()
 
-    def update_user(self, id, email, password, name): 
+    def update_user(self, id, email, password, name, path, phone): 
         self.id = id
         self.email = email
         self.password = password
         self.name = name
+        self.path = path
+        self.phone = phone
 
     def delete_user(self): 
         database.session.delete(self)
